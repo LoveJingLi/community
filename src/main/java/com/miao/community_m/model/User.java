@@ -1,5 +1,8 @@
 package com.miao.community_m.model;
 
+import lombok.Data;
+
+@Data
 public class User {
     private Integer id;
     private String name;
@@ -7,5 +10,6 @@ public class User {
     private String token;
     private Long gmtCreate;
     private Long gmtModified;
+    private String avatarUrl;
 
 }
