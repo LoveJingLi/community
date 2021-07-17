@@ -6,6 +6,8 @@ import com.miao.community_m.dto.GithubUser;
 import okhttp3.*;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Component
 public class GithubProvider {
     public String getAccessToken(AccessTokenDTO accessTokenDTO){
@@ -15,6 +17,9 @@ public class GithubProvider {
 
         MediaType mediaType = MediaType.get("application/json; charset=utf-8");
         OkHttpClient client = new OkHttpClient();
+//        OkHttpClient client = new OkHttpClient().newBuilder().connectTimeout(50000, TimeUnit.MILLISECONDS)
+//                .readTimeout(50000, TimeUnit.MILLISECONDS)
+//                .build();
 
         RequestBody body = RequestBody.create(mediaType, JSON.toJSONString(accessTokenDTO));
         Request request = new Request.Builder()
@@ -24,6 +29,7 @@ public class GithubProvider {
         try (Response response = client.newCall(request).execute()) {
             String string = response.body().string();
             String token = string.split("&")[0].split("=")[1];
+            System.out.println("token = " + token);
             return token;
         } catch (Exception e) {
 //            log.error("getAccessToken error,{}", accessTokenDTO, e);
