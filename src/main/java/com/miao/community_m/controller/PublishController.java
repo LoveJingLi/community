@@ -1,27 +1,39 @@
 package com.miao.community_m.controller;
 
+import com.miao.community_m.dto.QuestionDTO;
 import com.miao.community_m.mapper.QuestionMapper;
-import com.miao.community_m.mapper.UserMapper;
 import com.miao.community_m.model.Question;
 import com.miao.community_m.model.User;
+import com.miao.community_m.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class PublishController {
 
+//    @Autowired
+//    private QuestionMapper questionMapper;
+//
     @Autowired
-    private QuestionMapper questionMapper;
+    private QuestionService questionService;
 
-    @Autowired
-    private UserMapper userMapper;
+    @GetMapping("/publish/{id}")
+    public String edit(@PathVariable(name = "id") Integer id,
+                       Model model){
+        QuestionDTO question = questionService.getById(id);
+        model.addAttribute("title",question.getTitle());
+        model.addAttribute("description",question.getDescription());
+        model.addAttribute("tag",question.getTag());
+        model.addAttribute("id",question.getId());
+        return "publish";
+    }
 
     @GetMapping("/publish")
     public String publish(){
@@ -34,6 +46,7 @@ public class PublishController {
 //            @RequestParam(value = "title",required = false) String title,
             @RequestParam("description") String description,
             @RequestParam("tag") String tag,
+            @RequestParam("id") Integer id,
             HttpServletRequest request,
             Model model){
 
@@ -43,10 +56,9 @@ public class PublishController {
 
         if(title==null ||title==""){
             model.addAttribute("error","标题不能为空");
-            return "publish";
-        }
+            return "publish";}
         if(description==null ||description==""){
-            model.addAttribute("error","问题补充不能为空");
+             model.addAttribute("error","问题补充不能为空");
             return "publish";
         }
         if(tag==null ||tag==""){
@@ -54,20 +66,7 @@ public class PublishController {
             return "publish";
         }
 
-        User user=null;
-        Cookie[] cookies=request.getCookies();
-        if(cookies!=null && cookies.length!=0){
-            for (Cookie cookie : cookies) {
-                if(cookie.getName().equals("token")){
-                    String token = cookie.getValue();
-                    user=userMapper.findByToken(token);
-                    if(user!=null){
-                        request.getSession().setAttribute("user",user);
-                    }
-                    break;
-                }
-            }
-        }
+        User user = (User) request.getSession().getAttribute("user");
 
         if(user==null){
             model.addAttribute("error","用户未登录");
@@ -79,10 +78,11 @@ public class PublishController {
         question.setDescription(description);
         question.setTag(tag);
         question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
 
-        questionMapper.create(question);
+        question.setId(id);
+
+        questionService.createOrUpdate(question);
+//        questionMapper.create(question);
         return "redirect:/";
     }
 }

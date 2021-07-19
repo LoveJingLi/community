@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@MapperScan("com/miao/community_m/mapper")
+@MapperScan("com.miao.community_m.mapper")
 //@EnableScheduling
 public class CommunityMApplication {
 
