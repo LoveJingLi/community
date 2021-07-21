@@ -3,6 +3,7 @@ package com.miao.community_m.interceptor;
 import com.miao.community_m.mapper.UserMapper;
 import com.miao.community_m.model.User;
 import com.miao.community_m.model.UserExample;
+import com.miao.community_m.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.Nullable;
@@ -21,8 +22,8 @@ public class SessionInterceptor implements HandlerInterceptor {
 
     @Autowired
     private UserMapper userMapper;
-//    @Autowired
-//    private NotificationService notificationService;
+    @Autowired
+    private NotificationService notificationService;
 //    @Autowired
 //    private AdService adService;
 
@@ -53,10 +54,10 @@ public class SessionInterceptor implements HandlerInterceptor {
 //                    User user = userMapper.findByToken(token);
 //                    if (user != null) {
                     if (users.size() != 0) {
-//                        HttpSession session = request.getSession();
-//                        session.setAttribute("user", users.get(0));
-//                        Long unreadCount = notificationService.unreadCount(users.get(0).getId());
-//                        session.setAttribute("unreadCount", unreadCount);
+                        HttpSession session = request.getSession();
+                        session.setAttribute("user", users.get(0));
+                        Long unreadCount = notificationService.unreadCount(users.get(0).getId());
+                        session.setAttribute("unreadCount", unreadCount);
                         request.getSession().setAttribute("user",users.get(0));
 //                        request.getSession().setAttribute("user",user);
                     }
